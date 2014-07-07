@@ -25,9 +25,9 @@ class ModmanParser extends PathTranslationParser
      *
      * @param string $moduleDir
      */
-    public function __construct($moduleDir = null, $translations = array())
+    public function __construct($moduleDir = null, $translations = array(), $pathSuffix)
     {
-        parent::__construct($translations);
+        parent::__construct($translations, $pathSuffix);
 
         $this->setModuleDir($moduleDir);
         $this->setFile($this->getModmanFile());

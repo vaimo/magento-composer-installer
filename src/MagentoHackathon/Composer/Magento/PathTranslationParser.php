@@ -20,14 +20,17 @@ abstract class PathTranslationParser implements Parser
      */
     protected $pathPrefixTranslations = array();
 
+    protected $pathSuffix;
+
     /**
      * Constructor. Sets the list of path translations to use.
      *
      * @param array $translations Path translations
      */
-    public function __construct($translations)
+    public function __construct($translations, $pathSuffix)
     {
         $this->pathPrefixTranslations = $this->createPrefixVariants($translations);
+        $this->pathSuffix = $pathSuffix;
     }
 
     /**
@@ -76,8 +79,9 @@ abstract class PathTranslationParser implements Parser
                     break;
                 }
             }
+            //Adding path Suffix to the mapping info.
+            $mapping[1] = $this->pathSuffix . $mapping[1];
         }
-
         return $mappings;
     }
 }

@@ -363,7 +363,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
      */
     public function supports($packageType)
     {
-        return 'magento-module' === $packageType || 'magento-core' === $packageType;
+        return array_key_exists($packageType, PackageTypes::$packageTypes);
     }
 
     /**
@@ -718,18 +718,18 @@ class Installer extends LibraryInstaller implements InstallerInterface
                 $map = $moduleSpecificMap[$package->getName()];
             }
         }
-
+        $suffix = PackageTypes::$packageTypes[$package->getType()];
         if (isset($map)) {
-            $parser = new MapParser($map, $this->_pathMappingTranslations);
+            $parser = new MapParser($map, $this->_pathMappingTranslations,$suffix);
             return $parser;
         } elseif (isset($extra['map'])) {
-            $parser = new MapParser($extra['map'], $this->_pathMappingTranslations);
+            $parser = new MapParser($extra['map'], $this->_pathMappingTranslations, $suffix);
             return $parser;
         } elseif (isset($extra['package-xml'])) {
-            $parser = new PackageXmlParser($this->getSourceDir($package), $extra['package-xml'], $this->_pathMappingTranslations);
+            $parser = new PackageXmlParser($this->getSourceDir($package), $extra['package-xml'], $this->_pathMappingTranslations, $suffix);
             return $parser;
         } elseif (file_exists($this->getSourceDir($package) . '/modman')) {
-            $parser = new ModmanParser($this->getSourceDir($package), $this->_pathMappingTranslations);
+            $parser = new ModmanParser($this->getSourceDir($package), $this->_pathMappingTranslations, $suffix);
             return $parser;
         } else {
             throw new \ErrorException('Unable to find deploy strategy for module: no known mapping');

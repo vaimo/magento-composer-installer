@@ -32,10 +32,9 @@ class PackageXmlParser extends PathTranslationParser
      * @param string $packageXmlFile
      * @param array  $translations
      */
-    public function __construct($moduleDir, $packageXmlFile, $translations = array())
+    public function __construct($moduleDir, $packageXmlFile, $translations = array(), $pathSuffix)
     {
-        parent::__construct($translations);
-
+        parent::__construct($translations, $pathSuffix);
         $this->setModuleDir($moduleDir);
         $this->setFile($this->getModuleDir() . '/' . $packageXmlFile);
     }
