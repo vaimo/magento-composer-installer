@@ -223,7 +223,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $pathParts = array_merge($baseDir, $pathParts);
             $directoryPath = '';
             foreach ($pathParts as $pathPart) {
-                $directoryPath .= DIRECTORY_SEPARATOR . $pathPart;
+                $directoryPath .=  $pathPart . DIRECTORY_SEPARATOR;
                 $this->filesystem->ensureDirectoryExists($directoryPath);
             }
         }
