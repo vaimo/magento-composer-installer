@@ -121,6 +121,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
         $command = $event->getName();
         $this->deployManager->doDeploy();
         $this->deployLibraries();
+        $this->createAutoloadAdapter($event->getComposer());
     }
     
     
@@ -219,4 +220,36 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
 
     }
 
+    /**
+     * Generate adapter for composer autoloader to be automatically loaded by the application
+     *
+     * @param \Composer\Composer $composer
+     * @throws \UnexpectedValueException
+     */
+    private function createAutoloadAdapter(Composer $composer)
+    {
+        $extra = $composer->getPackage()->getExtra();
+        if (!isset($extra['magento-root-dir'])) {
+            return;
+        }
+        $magentoDir = realpath($extra['magento-root-dir']);
+        if (!is_dir($magentoDir)) {
+            throw new \UnexpectedValueException(
+                sprintf("Magento root dir '%s' doesn't exist", $magentoDir)
+            );
+        }
+        $magentoAppDir = $magentoDir . '/app';
+        $vendorAutoloadPath = realpath($composer->getConfig()->get('vendor-dir')) . '/autoload.php';
+        $vendorAutoloadRelPath = $this->filesystem->findShortestPath($magentoAppDir, $vendorAutoloadPath, true);
+        $appAutoloadAdapterPath = $magentoAppDir . '/vendor_autoload.php';
+        $autoloadAdapterContent = <<<AUTOLOAD
+<?php
+/**
+ * Adapter for composer autoload
+ */
+require_once '$vendorAutoloadRelPath';
+
+AUTOLOAD;
+        file_put_contents($appAutoloadAdapterPath, $autoloadAdapterContent);
+    }
 }
