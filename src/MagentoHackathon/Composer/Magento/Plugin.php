@@ -247,7 +247,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
 /**
  * Adapter for composer autoload
  */
-require_once '$vendorAutoloadRelPath';
+require_once __DIR__ . '/$vendorAutoloadRelPath';
 
 AUTOLOAD;
         file_put_contents($appAutoloadAdapterPath, $autoloadAdapterContent);
