@@ -154,3 +154,12 @@ Example:
 ```
 
 Final location will be `<root>/tools/Magento/Migration`
+
+
+## Autoload
+
+After handling all magento components, file `app/etc/vendor_path.php` with path to `vendor` directory is created inside application directory.
+
+This information allows the application to utilize Composer autoloader in case any libraries are installed in `vendor` directory. The path to `vendor` varies between particular installations and depends on `magento-root-dir` setting for the Magento Composer Installer. That's why it should be generated for each installation.
+
+After `composer install/update` is done the application is ready to work.
