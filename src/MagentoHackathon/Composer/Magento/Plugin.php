@@ -121,7 +121,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
         $command = $event->getName();
         $this->deployManager->doDeploy();
         $this->deployLibraries();
-        $this->createAutoloadAdapter($event->getComposer());
+        $this->saveVendorDirPath($event->getComposer());
     }
     
     
@@ -221,12 +221,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
     }
 
     /**
-     * Generate adapter for composer autoloader to be automatically loaded by the application
+     * Generate file with path to Composer 'vendor' dir to be used by the application
      *
      * @param \Composer\Composer $composer
      * @throws \UnexpectedValueException
      */
-    private function createAutoloadAdapter(Composer $composer)
+    private function saveVendorDirPath(Composer $composer)
     {
         $extra = $composer->getPackage()->getExtra();
         if (!isset($extra['magento-root-dir'])) {
@@ -238,18 +238,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
                 sprintf("Magento root dir '%s' doesn't exist", $magentoDir)
             );
         }
-        $magentoAppDir = $magentoDir . '/app';
-        $vendorAutoloadPath = realpath($composer->getConfig()->get('vendor-dir')) . '/autoload.php';
-        $vendorAutoloadRelPath = $this->filesystem->findShortestPath($magentoAppDir, $vendorAutoloadPath, true);
-        $appAutoloadAdapterPath = $magentoAppDir . '/vendor_autoload.php';
-        $autoloadAdapterContent = <<<AUTOLOAD
+        $vendorDirPath = $this->filesystem->findShortestPath(
+            $magentoDir,
+            realpath($composer->getConfig()->get('vendor-dir')),
+            true
+        );
+        $vendorPathFile = $magentoDir . '/app/etc/vendor_path.php';
+        $content = <<<AUTOLOAD
 <?php
 /**
- * Adapter for composer autoload
+ * Path to Composer vendor directory
  */
-require_once __DIR__ . '/$vendorAutoloadRelPath';
+return '$vendorDirPath';
 
 AUTOLOAD;
-        file_put_contents($appAutoloadAdapterPath, $autoloadAdapterContent);
+        file_put_contents($vendorPathFile, $content);
     }
 }
