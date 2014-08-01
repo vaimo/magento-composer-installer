@@ -383,7 +383,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
      *
      * @return string
      */
-    protected function getTargetDir()
+    public function getTargetDir()
     {
         $targetDir = realpath($this->magentoRootDir->getPathname());
         return $targetDir;

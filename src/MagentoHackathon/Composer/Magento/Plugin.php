@@ -48,6 +48,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
      */
     protected $composer;
 
+    /**
+     * @var Installer
+     */
+    private $installer;
 
     /**
      * @var Filesystem
@@ -72,14 +76,14 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
         $this->composer = $composer;
         $this->filesystem  = new Filesystem();
         $this->config = new ProjectConfig( $composer->getPackage()->getExtra() );
-        $installer = new Installer($io, $composer);
+        $this->installer = new Installer($io, $composer);
         $this->initDeployManager($composer, $io);
-        $installer->setDeployManager( $this->deployManager );
-        $installer->setConfig( $this->config );
+        $this->installer->setDeployManager( $this->deployManager );
+        $this->installer->setConfig( $this->config );
         if( $this->io->isDebug() ){
             $this->io->write('activate magento plugin');
         }
-        $composer->getInstallationManager()->addInstaller($installer);
+        $composer->getInstallationManager()->addInstaller($this->installer);
     }
 
     public static function getSubscribedEvents()
@@ -228,16 +232,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
      */
     private function saveVendorDirPath(Composer $composer)
     {
-        $extra = $composer->getPackage()->getExtra();
-        if (!isset($extra['magento-root-dir'])) {
-            return;
-        }
-        $magentoDir = realpath($extra['magento-root-dir']);
-        if (!is_dir($magentoDir)) {
-            throw new \UnexpectedValueException(
-                sprintf("Magento root dir '%s' doesn't exist", $magentoDir)
-            );
-        }
+        $magentoDir = $this->installer->getTargetDir();
         $vendorDirPath = $this->filesystem->findShortestPath(
             $magentoDir,
             realpath($composer->getConfig()->get('vendor-dir')),
