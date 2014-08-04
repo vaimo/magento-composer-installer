@@ -158,6 +158,9 @@ class Installer extends LibraryInstaller implements InstallerInterface
 
         if (isset($extra['magento-deploystrategy'])) {
             $this->_deployStrategy = (string)$extra['magento-deploystrategy'];
+            if($this->_deployStrategy !== "copy"){
+                $io->write('<warning>magento 2 is not tested with this deployment strategy. It may not function properly.</warning>');
+            }
         }
 
         if ((is_null($this->magentoRootDir) || false === $this->magentoRootDir->isDir())
@@ -340,11 +343,9 @@ class Installer extends LibraryInstaller implements InstallerInterface
                 $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Symlink($sourceDir, $targetDir);
                 break;
             case 'link':
-                $this->io->write("Warning: Magento 2 is not tested with this deployment strategy. It may not function properly.");
                 $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Link($sourceDir, $targetDir);
                 break;
             case 'none':
-                $this->io->write("Warning: Magento 2 is not tested with this deployment strategy. It may not function properly.");
                 $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\None($sourceDir, $targetDir);
                 break;
             case 'copy':
