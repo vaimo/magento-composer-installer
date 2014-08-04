@@ -59,7 +59,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
     /**
      * @var string
      */
-    protected $_deployStrategy = "symlink";
+    protected $_deployStrategy = "copy";
 
 
     const MAGENTO_REMOVE_DEV_FLAG = 'magento-remove-dev';
@@ -336,18 +336,20 @@ class Installer extends LibraryInstaller implements InstallerInterface
         $targetDir = $this->getTargetDir();
         $sourceDir = $this->getSourceDir($package);
         switch ($strategy) {
-            case 'copy':
-                $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Copy($sourceDir, $targetDir);
+            case 'symlink':
+                $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Symlink($sourceDir, $targetDir);
                 break;
             case 'link':
+                $this->io->write("Warning: Magento 2 is not tested with this deployment strategy. It may not function properly.");
                 $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Link($sourceDir, $targetDir);
                 break;
             case 'none':
+                $this->io->write("Warning: Magento 2 is not tested with this deployment strategy. It may not function properly.");
                 $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\None($sourceDir, $targetDir);
                 break;
-            case 'symlink':
+            case 'copy':
             default:
-                $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Symlink($sourceDir, $targetDir);
+                $impl = new \MagentoHackathon\Composer\Magento\Deploystrategy\Copy($sourceDir, $targetDir);
         }
         // Inject isForced setting from extra config
         $impl->setIsForced($this->isForced);
