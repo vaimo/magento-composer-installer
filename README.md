@@ -163,3 +163,9 @@ After handling all magento components, file `app/etc/vendor_path.php` with path 
 This information allows the application to utilize Composer autoloader in case any libraries are installed in `vendor` directory. The path to `vendor` varies between particular installations and depends on `magento-root-dir` setting for the Magento Composer Installer. That's why it should be generated for each installation.
 
 After `composer install/update` is done the application is ready to work.
+
+## Deploy Strategy
+
+The default deployment strategy used by magneto composer installer is `copy`. It will copy each files/directories from `vendor` directory to its designated location based on `extra/map` information stored in each component `composer.json` file.
+
+There are [other deployment strategy](https://github.com/magento-hackathon/magento-composer-installer/blob/master/doc/Deploy.md) that could be used, however magento 2.x system does not guarantee its successful operation.
