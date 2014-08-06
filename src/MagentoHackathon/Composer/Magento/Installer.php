@@ -159,7 +159,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
         if (isset($extra['magento-deploystrategy'])) {
             $this->_deployStrategy = (string)$extra['magento-deploystrategy'];
             if($this->_deployStrategy !== "copy"){
-                $io->write("<warning>Warning: magento 2 is not tested with \"{$this->_deployStrategy}\" deployment strategy. It may not function properly.</warning>");
+                $io->write("<warning>Warning: Magento 2 is not tested with \"{$this->_deployStrategy}\" deployment strategy. It may not function properly.</warning>");
             }
         }
 
