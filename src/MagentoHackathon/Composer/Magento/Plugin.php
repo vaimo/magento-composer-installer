@@ -98,9 +98,27 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
             ScriptEvents::POST_UPDATE_CMD => array(
                 array('onNewCodeEvent', 0),
             ),
+            ScriptEvents::POST_PACKAGE_UNINSTALL => array(
+                array('onPackageUnistall', 0),
+            )
         );
     }
 
+     public function onPackageUnistall( \Composer\Script\PackageEvent $event )
+    {
+        $ds = DIRECTORY_SEPARATOR;
+        $package = $event->getOperation()->getPackage();
+        list($vendor, $packageName) = explode('/', $package->getPrettyName());
+        $packageName = trim(str_replace('module-','',$packageName));
+        $packageInstallationPath =  $packageInstallationPath = $this->installer->getTargetDir();
+        $packagePath = ucfirst($vendor).$ds.str_replace(' ', '', ucwords(str_replace('-', ' ', $packageName)));
+        $this->io->write("Removing $packagePath");
+        $libPath = 'lib'.$ds.'internal'.$ds.$packagePath;
+        $magentoPackagePath = 'app'.$ds.'code'.$ds.$packagePath;
+        $deployStrategy = $this->installer->getDeployStrategy($package);
+        $deployStrategy->rmdirRecursive($packageInstallationPath.$ds.$libPath);
+        $deployStrategy->rmdirRecursive($packageInstallationPath.$ds.$magentoPackagePath);
+    }
 
     /**
      * actually is triggered before anything got executed
