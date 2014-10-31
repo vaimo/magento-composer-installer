@@ -128,7 +128,6 @@ class Installer extends LibraryInstaller implements InstallerInterface
 
             if (isset($rootDirInput)) {
                 $extra['magento-root-dir'] = $rootDirInput;
-                $this->updateJsonExtra($extra, $io);
             }
 
             $dir = rtrim(trim($extra['magento-root-dir']), '/\\');
