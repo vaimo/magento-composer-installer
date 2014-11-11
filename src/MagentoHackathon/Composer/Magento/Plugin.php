@@ -1,9 +1,9 @@
 <?php
 /**
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  */
 
 namespace MagentoHackathon\Composer\Magento;
@@ -23,14 +23,15 @@ use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem;
 use Symfony\Component\Process\Process;
 
-class Plugin implements PluginInterface, EventSubscriberInterface{
+class Plugin implements PluginInterface, EventSubscriberInterface
+{
 
     /**
      * @var IOInterface
      */
     protected $io;
-    
-    
+
+
     /**
      * @var ProjectConfig
      */
@@ -57,30 +58,34 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
      * @var Filesystem
      */
     protected $filesystem;
-    
-    
+
+    /**
+     * @var array PackageInterface
+     */
+    protected $installedPackages = [];
+
     protected function initDeployManager(Composer $composer, IOInterface $io)
     {
-        $this->deployManager = new DeployManager( $io );
-        
-        $extra          = $composer->getPackage()->getExtra();
-        $sortPriority   = isset($extra['magento-deploy-sort-priority']) ? $extra['magento-deploy-sort-priority'] : array();
-        $this->deployManager->setSortPriority( $sortPriority );
-        
+        $this->deployManager = new DeployManager($io);
+
+        $extra = $composer->getPackage()->getExtra();
+        $sortPriority = isset($extra['magento-deploy-sort-priority']) ? $extra['magento-deploy-sort-priority'] : array();
+        $this->deployManager->setSortPriority($sortPriority);
+
     }
-    
+
 
     public function activate(Composer $composer, IOInterface $io)
     {
-        $this->io  = $io;
+        $this->io = $io;
         $this->composer = $composer;
-        $this->filesystem  = new Filesystem();
-        $this->config = new ProjectConfig( $composer->getPackage()->getExtra() );
+        $this->filesystem = new Filesystem();
+        $this->config = new ProjectConfig($composer->getPackage()->getExtra());
         $this->installer = new Installer($io, $composer);
         $this->initDeployManager($composer, $io);
-        $this->installer->setDeployManager( $this->deployManager );
-        $this->installer->setConfig( $this->config );
-        if( $this->io->isDebug() ){
+        $this->installer->setDeployManager($this->deployManager);
+        $this->installer->setConfig($this->config);
+        if ($this->io->isDebug()) {
             $this->io->write('activate magento plugin');
         }
         $composer->getInstallationManager()->addInstaller($this->installer);
@@ -104,57 +109,59 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
         );
     }
 
-     public function onPackageUnistall( \Composer\Script\PackageEvent $event )
+    public function onPackageUnistall(\Composer\Script\PackageEvent $event)
     {
         $ds = DIRECTORY_SEPARATOR;
         $package = $event->getOperation()->getPackage();
         list($vendor, $packageName) = explode('/', $package->getPrettyName());
-        $packageName = trim(str_replace('module-','',$packageName));
-        $packageInstallationPath =  $packageInstallationPath = $this->installer->getTargetDir();
-        $packagePath = ucfirst($vendor).$ds.str_replace(' ', '', ucwords(str_replace('-', ' ', $packageName)));
+        $packageName = trim(str_replace('module-', '', $packageName));
+        $packageInstallationPath = $packageInstallationPath = $this->installer->getTargetDir();
+        $packagePath = ucfirst($vendor) . $ds . str_replace(' ', '', ucwords(str_replace('-', ' ', $packageName)));
         $this->io->write("Removing $packagePath");
-        $libPath = 'lib'.$ds.'internal'.$ds.$packagePath;
-        $magentoPackagePath = 'app'.$ds.'code'.$ds.$packagePath;
+        $libPath = 'lib' . $ds . 'internal' . $ds . $packagePath;
+        $magentoPackagePath = 'app' . $ds . 'code' . $ds . $packagePath;
         $deployStrategy = $this->installer->getDeployStrategy($package);
-        $deployStrategy->rmdirRecursive($packageInstallationPath.$ds.$libPath);
-        $deployStrategy->rmdirRecursive($packageInstallationPath.$ds.$magentoPackagePath);
+        $deployStrategy->rmdirRecursive($packageInstallationPath . $ds . $libPath);
+        $deployStrategy->rmdirRecursive($packageInstallationPath . $ds . $magentoPackagePath);
     }
 
     /**
      * actually is triggered before anything got executed
-     * 
+     *
      * @param \Composer\Plugin\CommandEvent $event
      */
-    public function onCommandEvent( \Composer\Plugin\CommandEvent $event )
+    public function onCommandEvent(\Composer\Plugin\CommandEvent $event)
     {
         $command = $event->getCommandName();
     }
 
     /**
      * event listener is named this way, as it listens for events leading to changed code files
-     * 
+     *
      * @param \Composer\Script\CommandEvent $event
      */
-    public function onNewCodeEvent( \Composer\Script\CommandEvent $event )
+    public function onNewCodeEvent(\Composer\Script\CommandEvent $event)
     {
-        if( $this->io->isDebug() ){
+        if ($this->io->isDebug()) {
             $this->io->write('start magento deploy via deployManager');
         }
         $command = $event->getName();
-        $this->deployManager->doDeploy();
+        $this->installedPackages = $event->getComposer()->getRepositoryManager()->getLocalRepository()->getPackages();
+        $this->deployManager->setInstaller($this->installer);
+        $this->deployManager->doDeploy($this->installedPackages);
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
     }
-    
-    
+
+
     protected function deployLibraries()
     {
         $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
         $autoloadDirectories = array();
-        
+
         $libraryPath = $this->config->getLibraryPath();
-        if( $libraryPath === null ){
-            if( $this->io->isDebug() ){
+        if ($libraryPath === null) {
+            if ($this->io->isDebug()) {
                 $this->io->write('jump over deployLibraries as no Magento libraryPath is set');
             }
             return;
@@ -162,50 +169,50 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
 
 
         $vendorDir = rtrim($this->composer->getConfig()->get('vendor-dir'), '/');
-        
-        $filesystem  = $this->filesystem;
+
+        $filesystem = $this->filesystem;
         $filesystem->removeDirectory($libraryPath);
         $filesystem->ensureDirectoryExists($libraryPath);
 
-        foreach( $packages as $package ){
+        foreach ($packages as $package) {
             /** @var PackageInterface $package */
-            $packageConfig = $this->config->getLibraryConfigByPackagename( $package->getName() );
-            if( $packageConfig === null ){
+            $packageConfig = $this->config->getLibraryConfigByPackagename($package->getName());
+            if ($packageConfig === null) {
                 continue;
             }
-            if( !isset($packageConfig['autoload']) ){
+            if (!isset($packageConfig['autoload'])) {
                 $packageConfig['autoload'] = array('/');
             }
-            foreach($packageConfig['autoload'] as $path){
-                $autoloadDirectories[] = $libraryPath.'/'.$package->getName()."/".$path;
+            foreach ($packageConfig['autoload'] as $path) {
+                $autoloadDirectories[] = $libraryPath . '/' . $package->getName() . "/" . $path;
             }
-            if( $this->io->isDebug() ){
-                $this->io->write('Magento deployLibraries executed for '.$package->getName());
+            if ($this->io->isDebug()) {
+                $this->io->write('Magento deployLibraries executed for ' . $package->getName());
             }
-            $libraryTargetPath = $libraryPath.'/'.$package->getName();
+            $libraryTargetPath = $libraryPath . '/' . $package->getName();
             $filesystem->removeDirectory($libraryTargetPath);
             $filesystem->ensureDirectoryExists($libraryTargetPath);
-            $this->copyRecursive($vendorDir.'/'.$package->getPrettyName(), $libraryTargetPath);
-            
+            $this->copyRecursive($vendorDir . '/' . $package->getPrettyName(), $libraryTargetPath);
+
         }
-        
-        $autoloadGenerator  = new AutoloadGenerator( new EventDispatcher($this->composer,$this->io) );
-        $classmap           = ClassMapGenerator::createMap($libraryPath);
-        $executable         = $this->composer->getConfig()->get('bin-dir') .'/phpab';
-        if( !file_exists($executable) ){
-            $executable         = $this->composer->getConfig()->get('vendor-dir') .'/theseer/autoload/composer/bin/phpab';
+
+        $autoloadGenerator = new AutoloadGenerator(new EventDispatcher($this->composer, $this->io));
+        $classmap = ClassMapGenerator::createMap($libraryPath);
+        $executable = $this->composer->getConfig()->get('bin-dir') . '/phpab';
+        if (!file_exists($executable)) {
+            $executable = $this->composer->getConfig()->get('vendor-dir') . '/theseer/autoload/composer/bin/phpab';
         }
-        if( file_exists($executable) ){
-            if( $this->io->isDebug() ){
+        if (file_exists($executable)) {
+            if ($this->io->isDebug()) {
                 $this->io->write('Magento deployLibraries executes autoload generator');
             }
-            $process = new Process( $executable." -o {$libraryPath}/autoload.php  ".implode(' ',$autoloadDirectories));
+            $process = new Process($executable . " -o {$libraryPath}/autoload.php  " . implode(' ', $autoloadDirectories));
             $process->run();
-        }else{
-            if( $this->io->isDebug() ){
+        } else {
+            if ($this->io->isDebug()) {
                 $this->io->write('Magento deployLibraries autoload generator not availabel, you should require "theseer/autoload"');
-                var_dump( $executable, getcwd());
-                
+                var_dump($executable, getcwd());
+
             }
         }
 
@@ -213,13 +220,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface{
     }
 
 
-
     /**
      * Copy then delete is a non-atomic version of {@link rename}.
      *
      * Some systems can't rename and also don't have proc_open,
      * which requires this solution.
-     * 
+     *
      * copied from \Composer\Util\Filesystem::copyThenRemove and removed the remove part
      *
      * @param string $source
