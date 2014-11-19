@@ -132,6 +132,10 @@ class Installer extends LibraryInstaller implements InstallerInterface
 
             $dir = rtrim(trim($extra['magento-root-dir']), '/\\');
             $this->magentoRootDir = new \SplFileInfo($dir);
+            if (!is_dir($dir) && $io->askConfirmation('magento root dir "' . $dir . '" missing! create now? [Y,n] ')) {
+                $this->initializeMagentoRootDir($dir);
+                $io->write('magento root dir "' . $dir . '" created');
+            }
 
             if (!is_dir($dir)) {
                 $dir = $this->vendorDir . "/$dir";
@@ -207,6 +211,26 @@ class Installer extends LibraryInstaller implements InstallerInterface
     public function getDeployManager()
     {
         return $this->deployManager;
+    }
+
+    /**
+     * Create base requrements for project installation
+     */
+    protected function initializeMagentoRootDir() {
+        if (!$this->magentoRootDir->isDir()) {
+            $magentoRootPath = $this->magentoRootDir->getPathname();
+            $pathParts = explode(DIRECTORY_SEPARATOR, $magentoRootPath);
+            $baseDir = explode(DIRECTORY_SEPARATOR, $this->vendorDir);
+            array_pop($baseDir);
+            $pathParts = array_merge($baseDir, $pathParts);
+            $directoryPath = '';
+            foreach ($pathParts as $pathPart) {
+                $directoryPath .=  $pathPart . DIRECTORY_SEPARATOR;
+                $this->filesystem->ensureDirectoryExists($directoryPath);
+            }
+        }
+
+        // $this->getSourceDir($package);
     }
 
 
