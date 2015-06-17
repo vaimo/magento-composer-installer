@@ -114,39 +114,33 @@ class Symlink extends DeploystrategyAbstract
 
     /**
      * Returns the relative path from $from to $to
-     *
      * This is utility method for symlink creation.
-     * Orig Source: http://stackoverflow.com/a/2638272/485589
+     *
+     * @param string $from
+     * @param string $to
+     *
+     * @return string
      */
     public function getRelativePath($from, $to)
     {
-        // Can't use realpath() here since the destination doesn't exist yet
         $from = str_replace(array('/./', '//'), '/', $from);
-        $from = explode('/', $from);
-
         $to = str_replace(array('/./', '//'), '/', $to);
-        $to = explode('/', $to);
 
-        $relPath = $to;
-
-        foreach ($from as $depth => $dir) {
-            // find first non-matching dir
-            if ($dir === $to[$depth]) {
-                // ignore this directory
-                array_shift($relPath);
-            } else {
-                // get number of remaining dirs to $from
-                $remaining = count($from) - $depth;
-                if ($remaining > 1) {
-                    // add traversals up to first matching dir
-                    $padLength = (count($relPath) + $remaining - 1) * -1;
-                    $relPath = array_pad($relPath, $padLength, '..');
-                    break;
-                } else {
-                    $relPath[0] = './' . $relPath[0];
-                }
-            }
+        if (is_file($from)) {
+            $from = dirname($from);
+        } else {
+            $from = rtrim($from, '/');
         }
-        return implode('/', $relPath);
+
+        $dir = explode('/', $from);
+        $file = explode('/', $to);
+
+        while ($file && $dir && ($dir[0] == $file[0])) {
+            array_shift($file);
+            array_shift($dir);
+        }
+
+        $relativePath = str_repeat('../', count($dir)) . implode('/', $file);
+        return $relativePath;
     }
 }
