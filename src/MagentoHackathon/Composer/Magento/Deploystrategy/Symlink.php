@@ -123,8 +123,8 @@ class Symlink extends DeploystrategyAbstract
      */
     public function getRelativePath($from, $to)
     {
-        $from = str_replace(array('/./', '//'), '/', $from);
-        $to = str_replace(array('/./', '//'), '/', $to);
+        $from = str_replace(array('/./', '//', '\\'), '/', $from);
+        $to = str_replace(array('/./', '//', '\\'), '/', $to);
 
         if (is_file($from)) {
             $from = dirname($from);
