@@ -406,6 +406,11 @@ class Installer extends LibraryInstaller implements InstallerInterface
 
         parent::install($repo, $package);
 
+        // skip marhsalin and apply default behavior in case if etra->map is not exists
+        if (!$this->hasExtraMap($package)) {
+            return;
+        }
+
         $strategy = $this->getDeployStrategy($package);
         $strategy->setMappings($this->getParser($package)->getMappings());
         $deployManagerEntry = new Entry();
@@ -599,6 +604,12 @@ class Installer extends LibraryInstaller implements InstallerInterface
             return;
         }
 
+        // skip marhsalin and apply default behavior in case if etra->map is not exists
+        if (!$this->hasExtraMap($target)) {
+            parent::update($repo, $initial, $target);
+            return;
+        }
+
         $initialStrategy = $this->getDeployStrategy($initial);
         $initialStrategy->setMappings($this->getParser($initial)->getMappings());
         $initialStrategy->clean();
@@ -643,7 +654,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
         $this->filesystem->rename($origRootDir, $backupDir);
         $this->filesystem->rename($tmpDir, $origRootDir);
         $this->magentoRootDir = clone $this->originalMagentoRootDir;
-        
+
         $this->prepareMagentoCore();
         $this->cleanupPostUpdateMagentoCore();
     }
@@ -696,6 +707,12 @@ class Installer extends LibraryInstaller implements InstallerInterface
      */
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
+        // skip marhsalin and apply default behavior in case if etra->map is not exists
+        if (!$this->hasExtraMap($package)) {
+            parent::uninstall($repo, $package);
+            return;
+        }
+
         $strategy = $this->getDeployStrategy($package);
         $strategy->setMappings($this->getParser($package)->getMappings());
         $strategy->clean();
@@ -791,5 +808,20 @@ class Installer extends LibraryInstaller implements InstallerInterface
         $io->write('<error> For the case you don\'t vote, I will ignore your problems till iam finished with the resulting release. </error>', true);
          * 
          **/
+    }
+
+    /**
+     * Checks if package has extra map value set
+     *
+     * @param PackageInterface $package
+     * @return bool
+     */
+    private function hasExtraMap(PackageInterface $package) {
+        $packageExtra = $package->getExtra();
+        if (isset($packageExtra['map'])) {
+            return true;
+        }
+
+        return false;
     }
 }
