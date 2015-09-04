@@ -406,7 +406,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
 
         parent::install($repo, $package);
 
-        // skip marhsalin and apply default behavior in case if etra->map is not exists
+        // skip marshal and apply default behavior if extra->map does not exist
         if (!$this->hasExtraMap($package)) {
             return;
         }
@@ -604,7 +604,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             return;
         }
 
-        // skip marhsalin and apply default behavior in case if etra->map is not exists
+        // skip marshal and apply default behavior if extra->map does not exist
         if (!$this->hasExtraMap($target)) {
             parent::update($repo, $initial, $target);
             return;
@@ -707,7 +707,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
      */
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        // skip marhsalin and apply default behavior in case if etra->map is not exists
+        // skip marshal and apply default behavior if extra->map does not exist
         if (!$this->hasExtraMap($package)) {
             parent::uninstall($repo, $package);
             return;
