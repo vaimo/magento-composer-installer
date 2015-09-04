@@ -7,9 +7,9 @@ Basing on component's type the code is installed to a certain directory, so that
 
 In `composer.json` of the component specify:
 - `type` - type of Magento 2 component
-- `extra/map` - list of files to move and their location relative to the path they will be located in the application.
+- `extra/map` - list of files to move and their location relative to the path they will be located in the application
 
-Note: Default behavior if extra->map does not exist.
+Note: Default behavior if extra->map does not exist
 
 ## Supported Components
 
