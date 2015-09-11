@@ -127,8 +127,6 @@ Final location is `<magento_root>/lib/internal/Magento/Framework`
 ### Magento Component
 `"type": "magento2-component"`
 
-Default type if none is specified.
-
 Installation location: Magento root directory
 
 Example:
