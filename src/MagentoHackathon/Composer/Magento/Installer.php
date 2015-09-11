@@ -604,24 +604,24 @@ class Installer extends LibraryInstaller implements InstallerInterface
             return;
         }
 
-        // skip marshal and apply default behavior if extra->map does not exist
-        if (!$this->hasExtraMap($target)) {
-            parent::update($repo, $initial, $target);
-            return;
+        // cleanup marshaled files if extra->map exist
+        if ($this->hasExtraMap($initial)) {
+            $initialStrategy = $this->getDeployStrategy($initial);
+            $initialStrategy->setMappings($this->getParser($initial)->getMappings());
+            $initialStrategy->clean();
         }
-
-        $initialStrategy = $this->getDeployStrategy($initial);
-        $initialStrategy->setMappings($this->getParser($initial)->getMappings());
-        $initialStrategy->clean();
 
         parent::update($repo, $initial, $target);
 
-        $targetStrategy = $this->getDeployStrategy($target);
-        $targetStrategy->setMappings($this->getParser($target)->getMappings());
-        $deployManagerEntry = new Entry();
-        $deployManagerEntry->setPackageName($target->getName());
-        $deployManagerEntry->setDeployStrategy($targetStrategy);
-        $this->deployManager->addPackage($deployManagerEntry);
+        // marshal files for new package version if extra->map exist
+        if ($this->hasExtraMap($target)) {
+            $targetStrategy = $this->getDeployStrategy($target);
+            $targetStrategy->setMappings($this->getParser($target)->getMappings());
+            $deployManagerEntry = new Entry();
+            $deployManagerEntry->setPackageName($target->getName());
+            $deployManagerEntry->setDeployStrategy($targetStrategy);
+            $this->deployManager->addPackage($deployManagerEntry);
+        }
 
         if($this->appendGitIgnore) {
             $this->appendGitIgnore($target, $this->getGitIgnoreFileLocation());
