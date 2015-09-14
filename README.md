@@ -1,23 +1,26 @@
 # Magento Composer Installer
 
-This is a fork of [Magento Composer Installer](https://github.com/magento-hackathon/magento-composer-installer) with support of Magento 2 components.
-Basing on component's type the code is installed to a certain directory, so that the application can handle it appropriately.
+This is a fork of the [Magento Composer Installer](https://github.com/magento-hackathon/magento-composer-installer) repo that provides support for Magento 2 components (modules, themes, language packages, libraries and components).
 
 ## Usage
 
-In `composer.json` of the component specify:
-- `type` - type of Magento 2 component
-- `extra/map` - list of files to move and their location relative to the path they will be located in the application
+In the component's `composer.json`, specify:
+
+*   `type`, type of Magento 2 component.
+*   `extra/map`, list of files to move and their paths relative to the Magento root directory.
+
+    **Note**: `extra/map` is required only if your component needs to be moved to a location other than `<Magento root>/vendor`. Otherwise, omit this section.
 
 ## Supported Components
+The following list explains the use of `type` in `composer.json`.
 
-### Magento Module
+### Magento Module 
+`"type": "magento2-module"`
 
-Type: `magento2-module`
-
-Installation location: `app/code`
+Installation location: Default vendor directory or as defined in `extra/map`
 
 Example:
+
 ```json
 {
     "name": "magento/module-core",
@@ -37,18 +40,17 @@ Example:
 }
 ```
 
-Final location will be `<root>/app/code/Magento/Core`
+Final location is `<magento root>/app/code/Magento/Core`
 
-### Magento Theme
-
-Type: `magento2-theme`
+### Magento Theme 
+`"type": "magento2-theme"`
 
 Installation location: `app/design`
 
 Example:
 ```json
 {
-    "name": "magento/theme-frontend-plushe",
+    "name": "magento/theme-frontend-luma",
     "description": "N/A",
     "require": {
         ...
@@ -58,18 +60,17 @@ Example:
         "map": [
             [
                 "*",
-                "frontend/Magento/plushe"
+                "frontend/Magento/luma"
             ]
         ]
     }
 }
 ```
 
-Final location will be `<root>/app/design/frontend/Magento/plushe`
+Final location is `<magento_root>/app/design/frontend/Magento/luma`
 
 ### Magento Language Package
-
-Type: `magento2-language`
+`"type": "magento2-language"`
 
 Installation location: `app/i18n`
 
@@ -93,17 +94,15 @@ Example:
 }
 ```
 
-Final location will be `<root>/app/i18n/Magento/de_DE`
+Final location is `<magento_root>/app/i18n/Magento/de_DE`
 
 ### Magento Library
+`"type": "magento2-library"`
 
-Support for libraries located in `lib/internal` instead of `vendor` directory.
-
-Installation location: `lib/internal`
-
-Type: `magento2-library`
+Support for libraries located in `lib/internal` instead of in the `vendor` directory.
 
 Example:
+
 ```json
 {
     "name": "magento/framework",
@@ -123,17 +122,15 @@ Example:
 }
 ```
 
-Final location will be `<root>/lib/internal/Magento/Framework`
+Final location is `<magento_root>/lib/internal/Magento/Framework`
 
 ### Magento Component
+`"type": "magento2-component"`
 
-Default type, if none is specified.
-
-Installation location: `.` (root directory of the code base)
-
-Type: `magento2-component`
+Installation location: Magento root directory
 
 Example:
+
 ```json
 {
     "name": "magento/migration-tool",
@@ -146,26 +143,24 @@ Example:
         "map": [
             [
                 "*",
-                "tools/Magento/Migration"
+                "dev/tools/Magento/Tools/Migration"
             ]
         ]
     }
 }
 ```
 
-Final location will be `<root>/tools/Magento/Migration`
+Final location is `<magento_root>/dev/tools/Magento/Tools/Migration`
 
 
 ## Autoload
+After handling all Magento components, `<magento_root>/app/etc/vendor_path.php` specifies the path to your `vendor` directory.
 
-After handling all magento components, file `app/etc/vendor_path.php` with path to `vendor` directory is created inside application directory.
+This information allows the Magento application to utilize the Composer autoloader for any libraries installed in the `vendor` directory. The path to `vendor` varies between particular installations and depends on the `magento_root` setting for the Magento Composer installer. That's why it should be generated for each installation.
 
-This information allows the application to utilize Composer autoloader in case any libraries are installed in `vendor` directory. The path to `vendor` varies between particular installations and depends on `magento-root-dir` setting for the Magento Composer Installer. That's why it should be generated for each installation.
-
-After `composer install/update` is done the application is ready to work.
+You must run `composer install` to install dependencies for a new application or `composer update` to update dependencies for an existing application.
 
 ## Deployment Strategy
+The Magneto Composer Installer uses the `copy` deployment strategy. It copies each file or directory from the `vendor` directory to its designated location based on the `extra/map` section in the component's `composer.json`.
 
-The default deployment strategy used by Magneto Composer Installer is `copy`. It will copy each files/directories from `vendor` directory to its designated location based on `extra/map` information stored in each component `composer.json` file.
-
-There are [other deployment strategy](https://github.com/magento-hackathon/magento-composer-installer/blob/master/doc/Deploy.md) that could be used, however Magento 2.x system does not guarantee its successful operation.
+There are [other deployment strategies](https://github.com/magento/magento-composer-installer/blob/master/doc/Deploy.md) that could be used; however, we don't guarantee that any of them will work.
