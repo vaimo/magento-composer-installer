@@ -166,4 +166,4 @@ The Magneto Composer Installer uses the `copy` deployment strategy. It copies ea
 There are [other deployment strategies](https://github.com/magento/magento-composer-installer/blob/master/doc/Deploy.md) that could be used; however, we don't guarantee that any of them will work.
 
 # Notes
-- Magento 2 does not support extra->magento-root-dir option, it exists due to compatibility with previous version.
+- The extra->magento-root-dir option is no longer supported. It displays only to preseve backward compatibility.
