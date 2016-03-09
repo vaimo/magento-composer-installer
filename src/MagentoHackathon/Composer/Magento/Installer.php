@@ -179,6 +179,8 @@ class Installer extends LibraryInstaller implements InstallerInterface
         if (isset($extra['magento-deploystrategy'])) {
             $this->setDeployStrategy((string)$extra['magento-deploystrategy']);
         }
+        
+        // @todo this is possible place to add env related modification
 
         if (!empty($extra['auto-append-gitignore'])) {
             $this->appendGitIgnore = true;
