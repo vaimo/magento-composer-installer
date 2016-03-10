@@ -176,11 +176,13 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $this->isForced = (bool)$extra['magento-force'];
         }
 
+        if (false !== getenv('PLATFORM_PROJECT')) {
+            $this->setDeployStrategy('none');
+        }
+
         if (isset($extra['magento-deploystrategy'])) {
             $this->setDeployStrategy((string)$extra['magento-deploystrategy']);
         }
-        
-        // @todo this is possible place to add env related modification
 
         if (!empty($extra['auto-append-gitignore'])) {
             $this->appendGitIgnore = true;
