@@ -188,6 +188,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $this->_pathMappingTranslations = (array)$extra['path-mapping-translations'];
         }
 
+        touch($this->magentoRootDir . '/var/.regenerate');
     }
 
 
