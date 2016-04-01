@@ -187,8 +187,6 @@ class Installer extends LibraryInstaller implements InstallerInterface
         if (!empty($extra['path-mapping-translations'])) {
             $this->_pathMappingTranslations = (array)$extra['path-mapping-translations'];
         }
-
-        touch($this->magentoRootDir . '/var/.regenerate');
     }
 
 
@@ -423,6 +421,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $this->appendGitIgnore($package, $this->getGitIgnoreFileLocation());
         }
 
+        touch($this->magentoRootDir . '/var/.regenerate');
     }
 
     /**
@@ -631,6 +630,8 @@ class Installer extends LibraryInstaller implements InstallerInterface
         if ($target->getType() === 'magento-core') {
             $this->postUpdateMagentoCore();
         }
+
+        touch($this->magentoRootDir . '/var/.regenerate');
     }
 
 
