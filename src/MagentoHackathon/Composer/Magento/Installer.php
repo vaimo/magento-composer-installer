@@ -61,6 +61,10 @@ class Installer extends LibraryInstaller implements InstallerInterface
      */
     protected $_deployStrategy = "copy";
 
+    /**
+     * @var string
+     */
+    private $regeneratePath = '/var/.regenerate';
 
     const MAGENTO_REMOVE_DEV_FLAG = 'magento-remove-dev';
     const MAGENTO_MAINTANANCE_FLAG = 'maintenance.flag';
@@ -421,7 +425,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $this->appendGitIgnore($package, $this->getGitIgnoreFileLocation());
         }
 
-        touch($this->magentoRootDir . '/var/.regenerate');
+        touch($this->magentoRootDir . $this->regeneratePath);
     }
 
     /**
@@ -631,7 +635,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $this->postUpdateMagentoCore();
         }
 
-        touch($this->magentoRootDir . '/var/.regenerate');
+        touch($this->magentoRootDir . $this->regeneratePath);
     }
 
 
