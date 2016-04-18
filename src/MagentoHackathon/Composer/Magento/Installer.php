@@ -425,7 +425,7 @@ class Installer extends LibraryInstaller implements InstallerInterface
             $this->appendGitIgnore($package, $this->getGitIgnoreFileLocation());
         }
 
-        touch($this->magentoRootDir . $this->regeneratePath);
+        touch($this->magentoRootDir->getPathname() . $this->regeneratePath);
     }
 
     /**
