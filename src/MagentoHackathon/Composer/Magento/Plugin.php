@@ -59,6 +59,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     protected $filesystem;
 
+    /**
+     * @var string
+     */
+    private $regenerate = '/var/.regenerate';
+
     protected function initDeployManager(Composer $composer, IOInterface $io)
     {
         $this->deployManager = new DeployManager($io);
@@ -144,6 +149,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployManager->doDeploy();
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
+        $filename = $this->installer->getTargetDir() . $this->regenerate;
+        touch($filename);
     }
 
 
