@@ -149,8 +149,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployManager->doDeploy();
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
-        $filename = $this->installer->getTargetDir() . $this->regenerate;
-        touch($filename);
+        if (file_exists($this->installer->getTargetDir() . '/var')) {
+            $filename = $this->installer->getTargetDir() . $this->regenerate;
+            touch($filename);
+        }
     }
 
 
