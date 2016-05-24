@@ -63,7 +63,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * @var string
      */
-    private $regenerate = '/var/.regenerate';
+    private $regenerate = '/.regenerate';
 
     /**
      * @var string
