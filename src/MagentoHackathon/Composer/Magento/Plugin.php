@@ -62,7 +62,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * @var string
      */
-    private $var = '/var';
+    private $varFolder = '/var';
 
     /**
      * @var string
@@ -154,8 +154,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployManager->doDeploy();
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
-        if (file_exists($this->installer->getTargetDir() . $this->var)) {
-            $filename = $this->installer->getTargetDir() . $this->var . $this->regenerate;
+        if (file_exists($this->installer->getTargetDir() . $this->varFolder)) {
+            $filename = $this->installer->getTargetDir() . $this->varFolder . $this->regenerate;
             touch($filename);
         }
     }
