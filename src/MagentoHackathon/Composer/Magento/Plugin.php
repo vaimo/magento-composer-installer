@@ -63,7 +63,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * @var string
      */
-    private $regenerate = '/var/.regenerate';
+    private $regenerate = '/.regenerate';
+
+    /**
+     * @var string
+     */
+    private $varFolder = '/var';
 
     protected function initDeployManager(Composer $composer, IOInterface $io)
     {
@@ -150,8 +155,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployManager->doDeploy();
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
-        $filename = $this->installer->getTargetDir() . $this->regenerate;
-        touch($filename);
+        if (file_exists($this->installer->getTargetDir() . $this->varFolder)) {
+            $filename = $this->installer->getTargetDir() . $this->varFolder . $this->regenerate;
+            touch($filename);
+        }
     }
 
 
