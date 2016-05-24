@@ -70,11 +70,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     private $varFolder = '/var';
 
-    /**
-     * @var string
-     */
-    private $regenerate = '/.regenerate';
-
     protected function initDeployManager(Composer $composer, IOInterface $io)
     {
         $this->deployManager = new DeployManager($io);
