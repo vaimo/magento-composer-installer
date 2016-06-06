@@ -308,10 +308,10 @@ abstract class DeploystrategyAbstract
 
         // If source doesn't exist, check if it's a glob expression, otherwise we have nothing we can do
         if (!file_exists($sourcePath)) {
-            $this->handleGlobing($sourcePath, $destPath);
+            $this->removeContentOfCategory($sourcePath, $destPath);
             return;
         } elseif (file_exists($sourcePath) && is_dir($sourcePath)) {
-            $this->handleGlobing($sourcePath . '/*', $destPath);
+            $this->removeContentOfCategory($sourcePath . '/*', $destPath);
             @rmdir($destPath);
             return;
         }
@@ -325,13 +325,13 @@ abstract class DeploystrategyAbstract
     }
 
     /**
-     * Handle globing
+     * Search and remove content of category
      *
      * @param string $sourcePath
      * @param string $destPath
      * @throws \ErrorException
      */
-    protected function handleGlobing($sourcePath, $destPath)
+    protected function removeContentOfCategory($sourcePath, $destPath)
     {
         $matches = glob($sourcePath);
         if ($matches) {
