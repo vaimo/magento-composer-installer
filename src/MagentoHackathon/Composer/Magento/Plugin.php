@@ -129,6 +129,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $deployStrategy = $this->installer->getDeployStrategy($package);
         $deployStrategy->rmdirRecursive($packageInstallationPath . $ds . $libPath);
         $deployStrategy->rmdirRecursive($packageInstallationPath . $ds . $magentoPackagePath);
+
+        // Force regeneration of var/di, var/cache, var/generation on next object manager invocation
+        if (file_exists($this->installer->getTargetDir() . $this->varFolder)) {
+            $filename = $this->installer->getTargetDir() . $this->varFolder . $this->regenerate;
+            touch($filename);
+        }
     }
 
     /**
@@ -155,6 +161,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployManager->doDeploy();
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
+
+        // Force regeneration of var/di, var/cache, var/generation on next object manager invocation
         if (file_exists($this->installer->getTargetDir() . $this->varFolder)) {
             $filename = $this->installer->getTargetDir() . $this->varFolder . $this->regenerate;
             touch($filename);
