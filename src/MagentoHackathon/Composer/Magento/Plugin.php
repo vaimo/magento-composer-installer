@@ -157,8 +157,36 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
         $this->requestRegeneration();
+        $this->setFilesPermissions();
     }
 
+    /**
+     * Set permissions for files using extra->chmod from composer.json
+     *
+     * @return void
+     */
+    protected function setFilesPermissions()
+    {
+        $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
+
+        foreach ($packages as $package) {
+            $extra = $package->getExtra();
+            if (!isset($extra['chmod']) || !is_array($extra['chmod'])) {
+                continue;
+            }
+
+            foreach ($extra['chmod'] as $chmod) {
+                if (!isset($chmod[0]) || !isset($chmod[1]) || strpos($chmod[1], '..') !== false) {
+                    continue;
+                }
+
+                $file = $this->installer->getTargetDir() . '/' . $chmod[1];
+                if (file_exists($file)) {
+                    chmod($file, octdec($chmod[0]));
+                }
+            }
+        }
+    }
 
     protected function deployLibraries()
     {
