@@ -8,7 +8,7 @@ In the component's `composer.json`, specify:
 
 *   `type`, type of Magento 2 component.
 *   `extra/map`, list of files to move and their paths relative to the Magento root directory.
-*   `extra/chmod`, list of permissions of files that should be set.
+*   `extra/chmod`, list of permissions that should be set for files.
 
     **Note**:
     * `extra/map` is required only if your component needs to be moved to a location other than `<Magento root>/vendor`. Otherwise, omit this section.
@@ -175,7 +175,7 @@ The following example shows how you can set specific permissions for files.
 
 Example:
 
-```
+```json
 {
     "name": "magento/module-sample",
     "description": "N/A",
@@ -198,11 +198,11 @@ Example:
 }
 ```
 
-`mask` is bit mask for chmod command
+`mask` is a bit mask for chmod command
 
-`path` is path to file: `<magento_root>/<path>`
+`path` is a path to file: `<magento_root>/<path>`
 
-For example: `some_dir/file.jpg`
+For example: `<magento_root>/some_dir/file.jpg`
 
 # Notes
 - The extra->magento-root-dir option is no longer supported. It displays only to preseve backward compatibility.
