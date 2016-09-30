@@ -200,9 +200,7 @@ Example:
 
 `mask` is a bit mask for chmod command
 
-`path` is a path to file: `<magento_root>/<path>`
-
-For example: `<magento_root>/some_dir/file.jpg`
+`path` is a path to file relative to the Magento root folder
 
 # Notes
 - The extra->magento-root-dir option is no longer supported. It displays only to preseve backward compatibility.
