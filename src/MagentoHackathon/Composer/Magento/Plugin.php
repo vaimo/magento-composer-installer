@@ -168,9 +168,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     private function setFilePermissions()
     {
         $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
+        $message = 'Check "chmod" section in composer.json of %s package.';
 
         foreach ($packages as $package) {
-            $message = 'Check "chmod" section in composer.json of ' . $package->getName() . ' package.';
             $extra = $package->getExtra();
             if (!isset($extra['chmod']) || !is_array($extra['chmod'])) {
                 continue;
@@ -189,7 +189,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
                 } else {
                     $this->io->writeError([
                         'File doesn\'t exist: ' . $chmod['path'],
-                        $message
+                        sprintf($message, $package->getName())
                     ]);
                 }
             }
@@ -197,7 +197,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             if ($error) {
                 $this->io->writeError([
                     'Incorrect mask or file path.',
-                    $message
+                    sprintf($message, $package->getName())
                 ]);
             }
         }
