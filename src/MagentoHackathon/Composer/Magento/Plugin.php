@@ -157,7 +157,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->deployLibraries();
         $this->saveVendorDirPath($event->getComposer());
         $this->requestRegeneration();
-        $this->setFilesPermissions();
+        $this->setFilePermissions();
     }
 
     /**
@@ -165,7 +165,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      *
      * @return void
      */
-    private function setFilesPermissions()
+    private function setFilePermissions()
     {
         $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
 
