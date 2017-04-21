@@ -1,6 +1,6 @@
 # Magento Composer Installer
 
-This is a fork of the [Magento Composer Installer](https://github.com/magento-hackathon/magento-composer-installer) repo that provides support for Magento 2 components (modules, themes, language packages, libraries and components).
+This is a fork of [Magento's fork](https://github.com/magento/magento-composer-installer) of Magento Hackathon composer package to be able to address some installation issues that one might encounter due to some code changes VS the original module.
 
 ## Usage
 
